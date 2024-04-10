@@ -26,10 +26,10 @@ class CNN(nn.Module):
     def __init__(self, input_shape, num_actions):
         super(CNN, self).__init__()
         self.conv1 = nn.Conv2d(input_shape[2], 32, kernel_size=3, stride=1, padding=1)
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
+        self.conv2 = nn.Conv2d(32, 16, kernel_size=3, stride=1, padding=1)
         self.relu = nn.ReLU(inplace=True)
         self.flatten = nn.Flatten(start_dim=0, end_dim=-1)
-        self.fc1 = nn.Linear(64 * input_shape[0] * input_shape[1], 256)
+        self.fc1 = nn.Linear(16 * input_shape[0] * input_shape[1], 256)
         self.fc2 = nn.Linear(256, num_actions)
 
     def forward(self, x):

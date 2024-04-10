@@ -14,7 +14,7 @@ class nn_Agent:
         self._action_space = enviroment.action_space()
         self._action_size = enviroment.n_actions
         # 经验回放池
-        self.expirience_replay = deque(maxlen=5)
+        self.expirience_replay = deque(maxlen=100)
         self.reward_replay = deque(maxlen=5)
         
         # Initialize discount and exploration rate
@@ -54,8 +54,8 @@ class nn_Agent:
 
     def retrain(self, batch_size):
         # 利用经验池训练
-        minibatch = random.sample(self.expirience_replay, len(self.expirience_replay))
-        
+        minibatch = random.sample(self.expirience_replay, batch_size)
+        loss = 0
         for state, action, reward, next_state, terminated in minibatch:
             input = torch.from_numpy(state.T).float().to(self.device)
             y_pred = self.q_network(input)
@@ -68,27 +68,28 @@ class nn_Agent:
                 labels[action] = reward + self.gamma * torch.max(t).item()
             
             # 梯度下降
-            loss = self.criterion(y_pred, labels)
-            self.optim.zero_grad()
-            loss.backward()
-            self.optim.step()
+            loss += self.criterion(y_pred, labels)
+        self.optim.zero_grad()
+        loss.backward()
+        self.optim.step()
+        return loss.item()/len(minibatch)
         # 利用奖励池训练
-        minibatch = random.sample(self.reward_replay, min(batch_size, len(self.reward_replay)))
+        # minibatch = random.sample(self.reward_replay, min(batch_size, len(self.reward_replay)))
 
-        for state, action, reward, next_state, terminated in minibatch:
-            input = torch.from_numpy(state.T).float().to(self.device)
-            y_pred = self.q_network(input)
-            labels = y_pred.clone()
-            if terminated:
-                labels[action] = reward
-            else:
-                next_input = torch.from_numpy(next_state.T).float().to(self.device)
-                t = self.target_network(next_input)
-                labels[action] = reward + self.gamma * torch.max(t).item()
+        # for state, action, reward, next_state, terminated in minibatch:
+        #     input = torch.from_numpy(state.T).float().to(self.device)
+        #     y_pred = self.q_network(input)
+        #     labels = y_pred.clone()
+        #     if terminated:
+        #         labels[action] = reward
+        #     else:
+        #         next_input = torch.from_numpy(next_state.T).float().to(self.device)
+        #         t = self.target_network(next_input)
+        #         labels[action] = reward + self.gamma * torch.max(t).item()
             
-            # 梯度下降
-            loss = self.criterion(y_pred, labels)
-            self.optim.zero_grad()
-            loss.backward()
-            self.optim.step()
+        #     # 梯度下降
+        #     loss = self.criterion(y_pred, labels)
+        #     self.optim.zero_grad()
+        #     loss.backward()
+        #     self.optim.step()
         
