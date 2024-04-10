@@ -19,7 +19,7 @@ if __name__ == '__main__':
     save_path = "models/model_test.pkl"
     load_path = "models/1221_14fov_3_80reached.pkl"
     # 环境和智能体初始化
-    env = StaticEnvironment(local_fov=14, num_dyna=50)
+    env = StaticEnvironment(local_fov=14, num_dyna=10)
     # env.is_render = True
     state = env.reset()
     model = network.CNN(env.dim_states, env.n_actions).to(device)
@@ -74,7 +74,7 @@ if __name__ == '__main__':
         step_list.append(timestep)
     print("num_finished_episodes:", num_finished_episodes, "percentage:", num_finished_episodes/num_of_episodes)
     torch.save(agent.q_network.state_dict(), save_path)
-    add_str = "_0410_1"
+    add_str = "_0410_2"
     np.save("plot_data/loss"+add_str, np.array(loss_list))
     np.save("plot_data/reward"+add_str, np.array(reward_list))
     np.save("plot_data/steps"+add_str, np.array(step_list))
