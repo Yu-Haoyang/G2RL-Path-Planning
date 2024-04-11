@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 from matplotlib import font_manager
 
 plt.rcParams['font.sans-serif']=['kaiti']
-add_str = "reward"
-data_list = np.load("plot_data/"+add_str+"_0410_2.npy")
+add_str = "steps"
+data_list = np.load("plot_data/"+add_str+"_0411_1.npy")
 
 num = len (data_list)
 x = range(num)
